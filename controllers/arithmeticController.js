@@ -10,8 +10,8 @@ const parseIntFromBody = ({ operationType, x, y }) => {
     }
   });
   //no in integers operation type and x, y were not provided so it's a bad request
-  if (probableInt.length < 2 && !x && !y) {
-    return { intx: 0, inty: 0, error: "missing data types" };
+  if (probableInt.length < 2 && !x || !y) {
+    return { intx: 0, inty: 0, parseIntError: "missing data types" };
     //x and y were provided and < 2 integers in operation type
   } else if (probableInt.length < 2) {
     intx = parseInt(x);
@@ -22,7 +22,7 @@ const parseIntFromBody = ({ operationType, x, y }) => {
     inty = parseInt(probableInt[1])
   }
 
-  return { intx, inty, error: "" };
+  return { intx, inty, parseIntError: "" };
 };
 
 const getOperator = ({ operationType }) => {
@@ -45,11 +45,10 @@ const getOperator = ({ operationType }) => {
   } else if (hasSubtractionOperator) {
     operator = "subtraction";
   } else {
-    console.log("this is ", operator);
-    return { operator: " ", error: "invalid operation type" };
+    console.log('error');
+    return { operatorError: "invalid operation type" };
   }
-
-  return { operator, error: "" };
+  return { operator, operatorError: "" };
 };
 
 const handleArithmetic = (req, res) => {
@@ -64,16 +63,17 @@ const handleArithmetic = (req, res) => {
   const operationType = operation_type.toLowerCase(); //setting incoming string to lowercase
 
   //parse integers from the request body
-  const { intx, inty, error } = parseIntFromBody({ x, y, operationType });
+  const { intx, inty, parseIntError } = parseIntFromBody({ x, y, operationType });
 
-  if (error) {
-    return res.status(400).json({ message: error });
+  if (parseIntError) {
+    return res.status(400).json({ message: parseIntError });
   }
 
   //getting operator
-  const { operator, error: operatorError } = getOperator({ operationType });
+  const { operator, operatorError } = getOperator({ operationType });
 
-  if (error) {
+  if (operatorError) {
+    console.log('error error');
     return res.status(400).json({ message: operatorError });
   }
 
