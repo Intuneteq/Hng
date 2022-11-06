@@ -10,7 +10,7 @@ const parseIntFromBody = ({ operationType, x, y }) => {
     }
   });
   //no in integers operation type and x, y were not provided so it's a bad request
-  if (probableInt.length < 2 && !x || !y) {
+  if (probableInt.length < 2 && !x && !y) {
     return { intx: 0, inty: 0, parseIntError: "missing data types" };
     //x and y were provided and < 2 integers in operation type
   } else if (probableInt.length < 2) {
