@@ -2,29 +2,27 @@ const parseIntFromBody = ({ operationType, x, y }) => {
   let intx;
   let inty;
 
-  //checking for potential operands in operationType
-  if (operationType.length > 14) {
-    const myArray = operationType.split(" ");
-    const probableNum = myArray.filter((item) => {
-      if (parseInt(item) && typeof parseInt(item) === "number") {
-        return item;
-      }
-    });
-    if (probableNum.length < 2 && !x && !y) {
-      return { intx: 0, inty: 0, error: "missing data types" };
-    } else if (probableNum.length < 2) {
-      intx = parseInt(x);
-      inty = parseInt(y);
-    } else {
-      intx = parseInt(probableNum[0]);
-      inty = parseInt(probableNum[1]);
+  const probableIntArray = operationType.split(" ");
+  const probableInt = probableIntArray.filter((item) => {
+    //if we have integers
+    if (parseInt(item) && typeof parseInt(item) === "number") {
+      return item;
     }
-  } else {
+  });
+  //no in integers operation type and x, y were not provided so it's a bad request
+  if (probableInt.length < 2 && !x || !y) {
+    return { intx: 0, inty: 0, parseIntError: "missing data types" };
+    //x and y were provided and < 2 integers in operation type
+  } else if (probableInt.length < 2) {
     intx = parseInt(x);
     inty = parseInt(y);
+    //> 2 integers in operation type and x, y may or may not have been provided
+  } else {
+    intx = parseInt(probableInt[0]);
+    inty = parseInt(probableInt[1])
   }
 
-  return { intx, inty, error: "" };
+  return { intx, inty, parseIntError: "" };
 };
 
 const getOperator = ({ operationType }) => {
@@ -47,11 +45,10 @@ const getOperator = ({ operationType }) => {
   } else if (hasSubtractionOperator) {
     operator = "subtraction";
   } else {
-    console.log("this is ", operator);
-    return { operator: " ", error: "invalid operation type" };
+    console.log('error');
+    return { operatorError: "invalid operation type" };
   }
-
-  return { operator, error: "" };
+  return { operator, operatorError: "" };
 };
 
 const handleArithmetic = (req, res) => {
@@ -66,18 +63,18 @@ const handleArithmetic = (req, res) => {
   const operationType = operation_type.toLowerCase(); //setting incoming string to lowercase
 
   //parse integers from the request body
-  const { intx, inty, error } = parseIntFromBody({ x, y, operationType });
+  const { intx, inty, parseIntError } = parseIntFromBody({ x, y, operationType });
 
-  if (error) {
-    return res.status(400).json({ message: error });
+  if (parseIntError) {
+    return res.status(400).json({ message: parseIntError });
   }
 
   //getting operator
-  const { operator, error: operatorError } = getOperator({ operationType });
+  const { operator, operatorError } = getOperator({ operationType });
 
-  if (error) {
-    return res.status(400).json({ message: operatorError})
-    // return res.status(400).json({ message: operatorError });
+  if (operatorError) {
+    console.log('error error');
+    return res.status(400).json({ message: operatorError });
   }
 
   //we have our operation_type handling as operator
