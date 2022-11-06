@@ -2,6 +2,7 @@ const parseIntFromBody = ({ operationType, x, y }) => {
   let intx;
   let inty;
 
+  //checking for potential operands in operationType
   if (operationType.length > 14) {
     const myArray = operationType.split(" ");
     const probableNum = myArray.filter((item) => {
