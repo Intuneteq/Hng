@@ -76,7 +76,8 @@ const handleArithmetic = (req, res) => {
   const { operator, error: operatorError } = getOperator({ operationType });
 
   if (error) {
-    return res.status(400).json({ message: operatorError });
+    return res.status(400).json({ message: operatorError})
+    // return res.status(400).json({ message: operatorError });
   }
 
   //we have our operation_type handling as operator
