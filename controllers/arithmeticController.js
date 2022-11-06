@@ -2,25 +2,24 @@ const parseIntFromBody = ({ operationType, x, y }) => {
   let intx;
   let inty;
 
-  if (operationType.length > 14) {
-    const myArray = operationType.split(" ");
-    const probableNum = myArray.filter((item) => {
-      if (parseInt(item) && typeof parseInt(item) === "number") {
-        return item;
-      }
-    });
-    if (probableNum.length < 2 && !x && !y) {
-      return { intx: 0, inty: 0, error: "missing data types" };
-    } else if (probableNum.length < 2) {
-      intx = parseInt(x);
-      inty = parseInt(y);
-    } else {
-      intx = parseInt(probableNum[0]);
-      inty = parseInt(probableNum[1]);
+  const probableIntArray = operationType.split(" ");
+  const probableInt = probableIntArray.filter((item) => {
+    //if we have integers
+    if (parseInt(item) && typeof parseInt(item) === "number") {
+      return item;
     }
-  } else {
+  });
+  //no in integers operation type and x, y were not provided so it's a bad request
+  if (probableInt.length < 2 && !x && !y) {
+    return { intx: 0, inty: 0, error: "missing data types" };
+    //x and y were provided and < 2 integers in operation type
+  } else if (probableInt.length < 2) {
     intx = parseInt(x);
     inty = parseInt(y);
+    //> 2 integers in operation type and x, y may or may not have been provided
+  } else {
+    intx = parseInt(probableInt[0]);
+    inty = parseInt(probableInt[1])
   }
 
   return { intx, inty, error: "" };
